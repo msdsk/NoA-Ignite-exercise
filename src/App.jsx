@@ -4,17 +4,18 @@ import repos from './assets/data/repos.json'
 import axios from 'axios'
 import clsx from 'clsx'
 import delay from 'delay'
+import millify from "millify"
 
 function App() {
   const style = Style()
 
   const [counter, setCounter] = useState(0)
-  const [currentRepo, setCurrentRepo] = useState({full_name: '', description: '', stargazers_count:''})
+  const [currentRepo, setCurrentRepo] = useState({full_name: 'Loading', description: 'Loading', stargazers_count:''})
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCurrentRepo(0)
-  }, []);
+    getCurrentRepo(counter)
+  }, [counter]);
 
   /**
    *
@@ -27,9 +28,10 @@ function App() {
     Promise.allSettled([
       // We're gonna resolve the promise no earlier than in .5 second
       // to finish the animation
-      delay(500),
-      axios.get(`https://api.github.com/repos/${repos[index]}`)])
-      .then((_,{data:{full_name, description, stargazers_count}})=>{
+      axios.get(`https://api.github.com/repos/${repos[index]}`),
+      delay(500)
+    ])
+      .then(([{value:{data:{full_name, description, stargazers_count}}}])=>{
         setCurrentRepo({
           full_name,
           description,
@@ -38,9 +40,9 @@ function App() {
       })
       // This is indeed a very questionable way of displaying errors
       // but I don't want to create another state for a simple exercise
-      .catch((error)=>setCurrentRepo({
+      .catch(()=>setCurrentRepo({
         full_name: 'Oh no! :[',
-        description: `Something went wrong. ${error.response?.status === 404 ? 'The repo doesn\'t seem to exist!' : ''}`,
+        description: `Something went wrong. Does the repo really exist?`,
         stargazers_count: ''
       }))
       .finally(()=>setLoading(false))
@@ -75,7 +77,8 @@ function App() {
 
           <div className={clsx(style.result, loading&&style.loadingResult)}>
             <h1>{currentRepo.full_name}</h1>
-            <div>{currentRepo.description}</div>
+            <div className={style.description}>{currentRepo.description}</div>
+            <div>★ <span className={style.stargazers}>{millify(parseInt(currentRepo.stargazers_count||0))}</span></div>
           </div>
 
       </div>

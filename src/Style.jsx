@@ -85,10 +85,12 @@ export default createUseStyles({
   },
   result:{
     maxWidth: '30em',
+    width: '100%',
     padding: '4em',
     textAlign: 'center',
     position: 'relative',
     overflow: 'hidden',
+    // For loading animation
     '&::before':{
       content:'""',
       display: 'block',
@@ -108,5 +110,8 @@ export default createUseStyles({
       boxShadow: '1em 0 1em -1em rgba(0,0,0,.5)',
       transform: 'translateX(-1em)',
     }
+  },
+  description:{
+    margin: '.5em 0'
   }
 })
